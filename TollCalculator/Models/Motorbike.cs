@@ -4,6 +4,7 @@ namespace TollCalculator.Models
 {
     public class Motorbike : Vehicle
     {
+        public bool IsTollFree => true;
         public string GetVehicleType()
         {
             return "Motorbike";
