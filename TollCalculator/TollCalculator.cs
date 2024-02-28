@@ -13,36 +13,36 @@ namespace TollCalculator
          * @return - the total toll fee for that day
          */
 
+        const int MaxFee = 60;
         const int MonthOfJuly = 7;
         public int GetTollFee(Vehicle vehicle, DateTime[] passages)
         {
+            if (!passages.Any()) return 0;
+
+            if (passages.Any(p => p.Date != passages.First().Date))
+            {
+                throw new ArgumentException("The passages must be during the same date");
+            }
+
             if (vehicle.IsTollFree) return 0;
 
             if (IsTollFreeDate(passages.First().Date)) return 0;
 
-            DateTime intervalStart = passages[0];
-            int totalFee = 0;
+            return CalculateTotalFee(passages);
+        }
 
-            foreach (DateTime date in passages)
+        private int CalculateTotalFee(DateTime[] passages)
+        {
+            var totalFee = 0;
+            var orderedPassages = passages.OrderBy(p => p).ToList();
+            var counter = 0;
+            for (var i = 0; i < orderedPassages.Count; i = counter)
             {
-                int nextFee = GetTollFee(date);
-                int tempFee = GetTollFee(intervalStart);
-
-                long diffInMillies = date.Millisecond - intervalStart.Millisecond;
-                long minutes = diffInMillies / 1000 / 60;
-
-                if (minutes <= 60)
-                {
-                    if (totalFee > 0) totalFee -= tempFee;
-                    if (nextFee >= tempFee) tempFee = nextFee;
-                    totalFee += tempFee;
-                }
-                else
-                {
-                    totalFee += nextFee;
-                }
+                var passagesWithinHour = orderedPassages.Skip(i).Where(t => t - orderedPassages[i] < TimeSpan.FromHours(1)).ToArray();
+                totalFee += passagesWithinHour.Select(GetTollFee).Max();
+                counter += passagesWithinHour.Length;
             }
-            if (totalFee > 60) totalFee = 60;
+            if (totalFee > MaxFee) totalFee = MaxFee;
             return totalFee;
         }
 
