@@ -15,7 +15,7 @@ namespace TollCalculator
 
         const int MaxFee = 60;
         const int MonthOfJuly = 7;
-        public int GetTollFee(Vehicle vehicle, DateTime[] passages)
+        public int GetDailyTollFee(Vehicle vehicle, DateTime[] passages)
         {
             if (!passages.Any()) return 0;
 
