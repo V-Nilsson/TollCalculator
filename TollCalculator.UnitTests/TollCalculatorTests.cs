@@ -104,4 +104,17 @@ public class TollCalculatorTests
         var result = subject.GetDailyTollFee(car, passages);
         Assert.Equal(60, result);
     }
+
+    [Fact]
+    public void GetDailyTollFee_EasterMonday_ReturnsZero()
+    {
+        var car = new Car();
+        var passages = new[]
+        {
+            DateTime.Parse("2024-04-01 08:20:30")
+        };
+
+        var result = subject.GetDailyTollFee(car, passages);
+        Assert.Equal(0, result);
+    }
 }
